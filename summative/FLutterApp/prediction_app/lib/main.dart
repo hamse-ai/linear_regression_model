@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gap/gap.dart';
+
+import 'api_service.dart';
+import 'bloc/prediction_bloc.dart';
+import 'bloc/prediction_event.dart';
+import 'bloc/prediction_state.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +16,386 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Math Score Predictor',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6C63FF),
+          brightness: Brightness.light,
+        ),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: BlocProvider(
+        create: (context) => PredictionBloc(apiService: ApiService()),
+        child: const PredictionScreen(),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class PredictionScreen extends StatefulWidget {
+  const PredictionScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<PredictionScreen> createState() => _PredictionScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _PredictionScreenState extends State<PredictionScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  String _gender = 'female';
+  String _raceEthnicity = 'group A';
+  String _parentalLevel = "bachelor's degree";
+  String _lunch = 'standard';
+  String _testPrep = 'none';
+
+  final _readingScoreController = TextEditingController();
+  final _writingScoreController = TextEditingController();
+
+  final List<String> genders = ['female', 'male'];
+  final List<String> races = ['group A', 'group B', 'group C', 'group D', 'group E'];
+  final List<String> parentalLevels = [
+    "bachelor's degree",
+    "some college",
+    "master's degree",
+    "associate's degree",
+    "high school",
+    "some high school"
+  ];
+  final List<String> lunches = ['standard', 'free/reduced'];
+  final List<String> testPreps = ['none', 'completed'];
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      final data = {
+        'gender': _gender,
+        'race_ethnicity': _raceEthnicity,
+        'parental_level_of_education': _parentalLevel,
+        'lunch': _lunch,
+        'test_preparation_course': _testPrep,
+        'reading_score': int.parse(_readingScoreController.text),
+        'writing_score': int.parse(_writingScoreController.text),
+      };
+
+      context.read<PredictionBloc>().add(PredictScoreEvent(data));
+    }
+  }
+
+  @override
+  void dispose() {
+    _readingScoreController.dispose();
+    _writingScoreController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6C63FF), Color(0xFF3B359A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.school_rounded,
+                    size: 80,
+                    color: Colors.white,
+                  ),
+                  const Gap(16),
+                  Text(
+                    'Math Score Predictor',
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const Gap(8),
+                  Text(
+                    'Estimate your expected math score using machine learning.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const Gap(32),
+                  _buildFormCard(),
+                  const Gap(24),
+                  _buildPredictionResult(),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Card(
+      elevation: 12,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Student Details',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF3B359A),
+                ),
+              ),
+              const Gap(20),
+              _buildDropdown(
+                label: 'Gender',
+                value: _gender,
+                items: genders,
+                onChanged: (val) => setState(() => _gender = val!),
+                icon: Icons.person_outline,
+              ),
+              const Gap(16),
+              _buildDropdown(
+                label: 'Race/Ethnicity',
+                value: _raceEthnicity,
+                items: races,
+                onChanged: (val) => setState(() => _raceEthnicity = val!),
+                icon: Icons.public,
+              ),
+              const Gap(16),
+              _buildDropdown(
+                label: 'Parent Admin',
+                value: _parentalLevel,
+                items: parentalLevels,
+                onChanged: (val) => setState(() => _parentalLevel = val!),
+                icon: Icons.family_restroom,
+              ),
+              const Gap(16),
+              _buildDropdown(
+                label: 'Lunch Type',
+                value: _lunch,
+                items: lunches,
+                onChanged: (val) => setState(() => _lunch = val!),
+                icon: Icons.restaurant_menu,
+              ),
+              const Gap(16),
+              _buildDropdown(
+                label: 'Test Prep Course',
+                value: _testPrep,
+                items: testPreps,
+                onChanged: (val) => setState(() => _testPrep = val!),
+                icon: Icons.menu_book,
+              ),
+              const Gap(16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildNumberField(
+                      controller: _readingScoreController,
+                      label: 'Reading Score',
+                      icon: Icons.chrome_reader_mode,
+                    ),
+                  ),
+                  const Gap(16),
+                  Expanded(
+                    child: _buildNumberField(
+                      controller: _writingScoreController,
+                      label: 'Writing Score',
+                      icon: Icons.edit_note,
+                    ),
+                  ),
+                ],
+              ),
+              const Gap(32),
+              ElevatedButton(
+                onPressed: _submitForm,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFF6C63FF),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 4,
+                ),
+                child: Text(
+                  'Predict Score',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildPredictionResult() {
+    return BlocBuilder<PredictionBloc, PredictionState>(
+      builder: (context, state) {
+        if (state is PredictionInitial) {
+          return const SizedBox.shrink();
+        } else if (state is PredictionLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        } else if (state is PredictionLoaded) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 10)
+              ],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Predicted Math Score',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const Gap(8),
+                Text(
+                  state.score.toStringAsFixed(1),
+                  style: GoogleFonts.poppins(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF3B359A),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else if (state is PredictionError) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.redAccent.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const Gap(12),
+                Expanded(
+                  child: Text(
+                    state.message,
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    required IconData icon,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: const Color(0xFF6C63FF)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.grey.shade50,
+      ),
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(
+             item.length > 20 ? '${item.substring(0, 17)}...' : item, 
+             style: GoogleFonts.poppins(fontSize: 14)
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildNumberField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      style: GoogleFonts.poppins(fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: const Color(0xFF6C63FF)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.grey.shade50,
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Req';
+        final val = int.tryParse(value);
+        if (val == null || val < 0 || val > 100) return '0-100';
+        return null;
+      },
     );
   }
 }
