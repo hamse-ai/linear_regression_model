@@ -300,7 +300,7 @@ class _PredictionScreenState extends State<PredictionScreen> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.redAccent.withOpacity(0.9),
+              color: Colors.redAccent.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -330,7 +330,7 @@ class _PredictionScreenState extends State<PredictionScreen> {
     required IconData icon,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       isExpanded: true,
       decoration: InputDecoration(
         labelText: label,
