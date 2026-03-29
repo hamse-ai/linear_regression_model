@@ -12,16 +12,7 @@ model = joblib.load(MODEL_PATH)
 scaler = joblib.load(SCALER_PATH)
 
 def make_prediction(input_data: dict) -> float:
-    # Expected categorical dummy columns from training:
-    # 'reading score', 'writing score'
-    # 'gender_male'
-    # 'race/ethnicity_group B', 'race/ethnicity_group C', 'race/ethnicity_group D', 'race/ethnicity_group E'
-    # 'parental level of education_bachelor\'s degree', 'parental level of education_high school', 
-    # 'parental level of education_master\'s degree', 'parental level of education_some college', 
-    # 'parental level of education_some high school'
-    # 'lunch_standard'
-    # 'test preparation course_none'
-    # Create a base dataframe with all zeros/falses for dummy columns
+
     dummy_columns = [
         'reading score', 'writing score', 'gender_male',
         'race/ethnicity_group B', 'race/ethnicity_group C',
