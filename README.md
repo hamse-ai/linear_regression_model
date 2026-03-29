@@ -1,8 +1,7 @@
 # Linear Regression Model for Predicting Student Math Performance
 
 ## Mission Statement & Problem Description
-This project builds on my broader mission of addressing educational inequality in underserved regions by leveraging data-driven solutions. Specifically, it develops a regression model to predict student math performance using socio-economic and demographic factors such as parental education, access to resources, and academic preparation. By achieving high predictive accuracy (R² > 0.80), the model identifies key indicators of underperformance and demonstrates how early detection systems can be implemented to support targeted interventions. This contributes to a scalable approach for improving educational outcomes in resource-limited communities.
-
+This project builds on my broader mission of addressing educational inequality in underserved regions by leveraging data-driven solutions. Specifically, it develops a regression model to predict student math performance using socio-economic and demographic factors such as parental education, access to resources, and academic preparation. This contributes to a scalable approach for improving educational outcomes in resource limited communities.
 ---
 
 ## Model API & Testing
