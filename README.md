@@ -16,7 +16,7 @@ To assess the model and test the prediction endpoints, you can use the **Swagger
 
 ## 📺 Project Video Demo
 You can view a demonstration of the model creation, evaluation, API integration and mobile app functionality here:
-**[https://youtu.be/RjGPUdNyNjw]** *(Max 5 minutes)*
+**[https://youtu.be/RjGPUdNyNjw]** 
 
 ---
 
